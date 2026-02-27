@@ -1,55 +1,41 @@
-// ===== NAV =====
+// Mark JS as loaded — enables CSS animations only when JS is available
+document.documentElement.classList.add('js-loaded');
+
+// ===== NAV TOGGLE (mobile) =====
 const navToggle = document.querySelector('.nav__toggle');
 const navLinks  = document.querySelector('.nav__links');
 
 if (navToggle && navLinks) {
-  navToggle.addEventListener('click', () => {
-    navLinks.classList.toggle('open');
-  });
+  navToggle.addEventListener('click', () => navLinks.classList.toggle('open'));
 }
 
-// Mobile dropdown toggles
+// Mobile: tap to open dropdowns
 document.querySelectorAll('.nav__item > .nav__link').forEach(link => {
-  const dropdown = link.nextElementSibling;
-  if (!dropdown) return;
+  if (!link.nextElementSibling) return;
   link.addEventListener('click', e => {
-    if (window.innerWidth <= 768) {
+    if (window.innerWidth <= 820) {
       e.preventDefault();
       link.parentElement.classList.toggle('open');
     }
   });
 });
 
-// Close nav on outside click
 document.addEventListener('click', e => {
-  if (!e.target.closest('.nav') && navLinks) {
-    navLinks.classList.remove('open');
-  }
+  if (!e.target.closest('.nav') && navLinks) navLinks.classList.remove('open');
 });
 
-// ===== FADE IN ON SCROLL =====
-const faders = document.querySelectorAll('.fade-in');
-
+// ===== FADE UP ON SCROLL =====
 if ('IntersectionObserver' in window) {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-
-  faders.forEach(el => observer.observe(el));
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.1, rootMargin: '0px 0px -32px 0px' });
+  document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
 } else {
-  faders.forEach(el => el.classList.add('visible'));
+  document.querySelectorAll('.fade-up').forEach(el => el.classList.add('in'));
 }
 
-// ===== ACTIVE NAV LINK =====
-const currentPath = window.location.pathname.split('/').pop() || 'index.html';
-document.querySelectorAll('.nav__link, .nav__dropdown a').forEach(link => {
-  const href = link.getAttribute('href');
-  if (href && (href === currentPath || href === './' + currentPath)) {
-    link.classList.add('active');
-  }
+// ===== ACTIVE NAV =====
+const current = window.location.pathname.split('/').pop() || 'index.html';
+document.querySelectorAll('.nav__link, .nav__dropdown a').forEach(a => {
+  if (a.getAttribute('href') === current || a.getAttribute('href') === './' + current) a.classList.add('active');
 });
